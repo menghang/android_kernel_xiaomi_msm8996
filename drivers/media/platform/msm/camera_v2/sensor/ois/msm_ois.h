@@ -1,4 +1,5 @@
 /* Copyright (c) 2014-2015, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2016 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -58,6 +59,15 @@ struct msm_ois_ctrl_t {
 	uint32_t subdev_id;
 	enum msm_ois_state_t ois_state;
 	struct msm_ois_vreg vreg_cfg;
+<<<<<<< HEAD
+=======
+	struct msm_camera_gpio_conf *gconf;
+	struct msm_pinctrl_info pinctrl_info;
+	uint8_t cam_pinctrl_status;
+	struct msm_ois_board_info *oboard_info;
+	struct workqueue_struct *work_queue;
+	struct work_struct work;
+>>>>>>> 9e2e770... drivers: media: camera_v2: Import Xiaomi changes
 };
 
 #endif
