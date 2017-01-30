@@ -10,6 +10,7 @@
  * GNU General Public License for more details.
  */
 
+#define DEBUG
 #define pr_fmt(fmt) "SMB1351 %s: " fmt, __func__
 
 #include <linux/i2c.h>

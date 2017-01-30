@@ -1228,6 +1228,7 @@
 	qcom,thermal-mitigation = <2500 2000 1100 1000>;
 	qcom,fastchg-current-comp = <700>;
 	qcom,float-voltage-comp = <16>;
+	qcom,battery-data = <&mtp_batterydata>;
 	qcom,override-usb-current;
 };
 

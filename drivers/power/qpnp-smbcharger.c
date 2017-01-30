@@ -9,6 +9,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
+#define DEBUG
 #define pr_fmt(fmt) "SMBCHG: %s: " fmt, __func__
 
 #include <linux/spmi.h>
@@ -509,6 +511,7 @@ static int smbchg_read(struct smbchg_chip *chip, u8 *val,
 	int rc = 0;
 	struct spmi_device *spmi = chip->spmi;
 
+	//pr_smb(PR_STATUS, "Start.\n");
 	if (addr == 0) {
 		dev_err(chip->dev, "addr cannot be zero addr=0x%02x sid=0x%02x rc=%d\n",
 			addr, spmi->sid, rc);
@@ -521,6 +524,7 @@ static int smbchg_read(struct smbchg_chip *chip, u8 *val,
 				addr, spmi->sid, rc);
 		return rc;
 	}
+	//pr_smb(PR_STATUS, "val=%d.\n", *val);
 	return 0;
 }
 
@@ -540,6 +544,7 @@ static int smbchg_write(struct smbchg_chip *chip, u8 *val,
 	int rc = 0;
 	struct spmi_device *spmi = chip->spmi;
 
+	//pr_smb(PR_STATUS, "Start.\n");
 	if (addr == 0) {
 		dev_err(chip->dev, "addr cannot be zero addr=0x%02x sid=0x%02x rc=%d\n",
 			addr, spmi->sid, rc);
@@ -1871,6 +1876,7 @@ static bool is_hvdcp_present(struct smbchg_chip *chip)
 	int rc;
 	u8 reg, hvdcp_sel;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	rc = smbchg_read(chip, &reg,
 			chip->usb_chgpth_base + USBIN_HVDCP_STS, 1);
 	if (rc < 0) {
@@ -1888,9 +1894,12 @@ static bool is_hvdcp_present(struct smbchg_chip *chip)
 	else
 		hvdcp_sel = USBIN_HVDCP_SEL_BIT;
 
-	if ((reg & hvdcp_sel) && is_usb_present(chip))
+	if ((reg & hvdcp_sel) && is_usb_present(chip)) {
+		pr_smb(PR_STATUS, "True.\n");
 		return true;
+	}
 
+	pr_smb(PR_STATUS, "False.\n");
 	return false;
 }
 
@@ -3511,6 +3520,7 @@ static void smbchg_aicl_deglitch_wa_check(struct smbchg_chip *chip)
 	int rc;
 	bool low_volt_chgr = true;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	if (!(chip->wa_flags & SMBCHG_AICL_DEGLITCH_WA))
 		return;
 
@@ -4605,6 +4615,7 @@ static void smbchg_hvdcp_det_work(struct work_struct *work)
 				hvdcp_det_work.work);
 	int rc;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	if (is_hvdcp_present(chip)) {
 		if (!chip->hvdcp3_supported &&
 			(chip->wa_flags & SMBCHG_HVDCP_9V_EN_WA)) {
@@ -4650,6 +4661,7 @@ static void restore_from_hvdcp_detection(struct smbchg_chip *chip)
 {
 	int rc;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	/* switch to 9V HVDCP */
 	rc = smbchg_sec_masked_write(chip, chip->usb_chgpth_base + CHGPTH_CFG,
 				HVDCP_ADAPTER_SEL_MASK, HVDCP_9V);
@@ -5162,6 +5174,7 @@ static void smbchg_handle_hvdcp3_disable(struct smbchg_chip *chip)
 	enum power_supply_type usb_supply_type;
 	char *usb_type_name = "NULL";
 
+	pr_smb(PR_STATUS, "Start.\n");
 	if (chip->allow_hvdcp3_detection)
 		return;
 
@@ -5472,6 +5485,7 @@ static bool is_hvdcp_5v_cont_mode(struct smbchg_chip *chip)
 	int rc;
 	u8 reg = 0;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	rc = smbchg_read(chip, &reg,
 		chip->usb_chgpth_base + USBIN_HVDCP_STS, 1);
 	if (rc) {
@@ -5500,6 +5514,7 @@ static int smbchg_prepare_for_pulsing_lite(struct smbchg_chip *chip)
 {
 	int rc = 0;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	pr_smb(PR_MISC, "HVDCP voting for 300mA ICL\n");
 	rc = vote(chip->usb_icl_votable, HVDCP_ICL_VOTER, true, 300);
 	if (rc < 0) {
@@ -5658,6 +5673,7 @@ static int smbchg_dp_dm(struct smbchg_chip *chip, int val)
 	int rc = 0;
 	int target_icl_vote_ma;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	switch (val) {
 	case POWER_SUPPLY_DP_DM_PREPARE:
 		if (!is_hvdcp_present(chip)) {
@@ -8009,6 +8025,7 @@ static void rerun_hvdcp_det_if_necessary(struct smbchg_chip *chip)
 	char *usb_type_name;
 	int rc;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	if (!(chip->wa_flags & SMBCHG_RESTART_WA))
 		return;
 
@@ -8362,6 +8379,7 @@ static void smbchg_shutdown(struct spmi_device *spmi)
 	struct smbchg_chip *chip = dev_get_drvdata(&spmi->dev);
 	int i, rc;
 
+	pr_smb(PR_STATUS, "Start.\n");
 	if (!(chip->wa_flags & SMBCHG_RESTART_WA))
 		return;
 
